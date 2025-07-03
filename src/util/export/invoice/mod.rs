@@ -528,7 +528,11 @@ fn render_row(
             .expect("mul works"),
     )
     .to_euro_str();
-    let pad_no_dot = if sum_str.contains('.') { 0.0 } else { 1.0 }; // if val is < 1000
+    let mut pad_no_dot = if sum_str.contains('.') { 0.0 } else { -1.0 }; // if val is < 1000
+    if item.price_per_unit.value < default_currency_value() {
+        // for negative numbers, pad
+        pad_no_dot = 1.0;
+    }
     render_col_text(
         // right-align
         Mm(LEFT.0
@@ -603,7 +607,7 @@ fn render_sum(top: Mm, sum_data: SumData, layer: &PdfLayerReference, font: &Indi
     );
     render_col_line(Mm(LEFT.0 + col_line_x), Mm(top.0 - ROW_HEIGHT), layer);
     let tax_str = sum_data.tax.to_euro_str();
-    let pad_no_dot = if tax_str.contains('.') { 0.0 } else { 1.0 }; // if val is < 1000
+    let pad_no_dot = if tax_str.contains('.') { 0.0 } else { -1.0 }; // if val is < 1000
     render_col_text(
         // right-align
         Mm(LEFT.0
