@@ -1,7 +1,7 @@
-use crate::GuiError;
 use crate::accounting::AccountingState;
 use crate::invoice::InvoiceState;
 use crate::messages::Messages;
+use crate::GuiError;
 use chrono::Datelike;
 use log::{error, info};
 use std::fs::{copy, create_dir_all, read_dir, remove_dir_all, remove_file};
@@ -34,10 +34,13 @@ pub(crate) fn copy_file_and_rename(
     if let Some(ext) = file_path.extension() {
         files_path.set_extension(ext);
     }
-    copy(file_path, &files_path).map_err(|e| {
-        error!("Copy, from {file_path:?} to {files_path:?} failed: {e}");
-        GuiError::CopyItemFileFailed(format!("{}, {}", Messages::ItemCopyFailed.msg(), e,))
-    })?;
+    // only copy, if it's not the same file to avoid deleting the file
+    if file_path != &files_path {
+        copy(file_path, &files_path).map_err(|e| {
+            error!("Copy, from {file_path:?} to {files_path:?} failed: {e}");
+            GuiError::CopyItemFileFailed(format!("{}, {}", Messages::ItemCopyFailed.msg(), e,))
+        })?;
+    }
 
     Ok(files_path)
 }
