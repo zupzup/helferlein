@@ -4,17 +4,17 @@ use chrono::NaiveDate;
 use printpdf::{Color, IndirectFontRef, Line, Mm, PdfDocument, PdfLayerReference, Point, Rgb};
 
 use crate::{
+    DATE_FORMAT, GuiError, Messages,
     data::{
-        currency::{default_currency_value, CurrencyValue, VatCalculationResult},
         Address, Invoice, InvoiceItem, ServicePeriod, Vat,
+        currency::{CurrencyValue, VatCalculationResult, default_currency_value},
     },
     util::export::PT_TO_MM,
-    GuiError, Messages, DATE_FORMAT,
 };
 
 use super::{
-    get_text_width, FONT, FONT_SIZE, LINE_WIDTH, MARGIN, MAX_CHARS_CURRENCY, PADDING, ROW_HEIGHT,
-    TABLE_LINE_HEIGHT,
+    FONT, FONT_SIZE, LINE_WIDTH, MARGIN, MAX_CHARS_CURRENCY, PADDING, ROW_HEIGHT,
+    TABLE_LINE_HEIGHT, get_text_width,
 };
 
 pub const MAX_ITEMS: usize = 10;
@@ -46,6 +46,7 @@ pub(crate) struct SumData {
     pub(crate) net: CurrencyValue,
     pub(crate) tax: CurrencyValue,
     pub(crate) total: CurrencyValue,
+    pub(crate) vat: Vat,
 }
 
 pub(crate) fn create_invoice_pdf(
@@ -307,7 +308,7 @@ pub(crate) fn render_pre(
 // ------------------------------------------------------------
 //                                        |      Net |        |
 //                                        ---------------------
-//                                        | 20 % VAT |        |
+//                                        | XX % VAT |        |
 //                                        ---------------------
 //                                        |    Total |        |
 //                                        ---------------------
@@ -601,7 +602,7 @@ fn render_sum(top: Mm, sum_data: SumData, layer: &PdfLayerReference, font: &Indi
     render_col_text(
         Mm(LEFT.0 + col_line_x_left_line + PADDING),
         Mm(top.0 - (ROW_HEIGHT * 2.0) + PADDING),
-        &format!("{} {}", Vat::Twenty.name(), Messages::Vat.msg()),
+        &format!("{} {}", sum_data.vat.name(), Messages::Vat.msg()),
         layer,
         font,
     );
@@ -813,7 +814,11 @@ fn calculate_sum(items: &[InvoiceItem]) -> SumData {
     let mut tax_sum = default_currency_value();
     let mut total_sum = default_currency_value();
 
+    let mut vat = Vat::Twenty;
     items.iter().for_each(|item| {
+        if item.vat != vat {
+            vat = item.vat;
+        }
         let net = item
             .price_per_unit
             .value
@@ -834,5 +839,6 @@ fn calculate_sum(items: &[InvoiceItem]) -> SumData {
         net: CurrencyValue::new_from_decimal(net_sum),
         tax: CurrencyValue::new_from_decimal(tax_sum),
         total: CurrencyValue::new_from_decimal(total_sum),
+        vat,
     }
 }
