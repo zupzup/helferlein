@@ -1,8 +1,5 @@
-use azul_text_layout::{
-    text_layout::{split_text_into_words, words_to_scaled_words},
-    text_shaping::get_font_metrics_freetype,
-};
 use printpdf::Pt;
+use ttf_parser::Face;
 
 pub(crate) mod accounting;
 pub(crate) mod invoice;
@@ -22,15 +19,20 @@ fn get_text_width(text: &str) -> f32 {
     if text.is_empty() {
         return 0.0;
     }
-    let space_count = text.chars().filter(|&c| c == ' ').count();
-    let font_index: i32 = 0;
-    let font_metrics = get_font_metrics_freetype(FONT, font_index);
-    let words = split_text_into_words(text);
-    // Use pt in pdf as px and assume 72 DPI
-    let scaled_words =
-        words_to_scaled_words(&words, FONT, font_index as u32, font_metrics, FONT_SIZE.0);
 
-    let total_width: f32 = scaled_words.items.iter().map(|i| i.word_width).sum();
-    let space_width: f32 = space_count as f32 * 2.78;
-    total_width + space_width
+    let Ok(face) = Face::parse(FONT, 0) else {
+        return 0.0;
+    };
+
+    let units_per_em = face.units_per_em() as f32;
+    let font_units = text
+        .chars()
+        .filter_map(|c| {
+            face.glyph_index(c)
+                .and_then(|glyph_id| face.glyph_hor_advance(glyph_id))
+        })
+        .map(f32::from)
+        .sum::<f32>();
+
+    font_units * FONT_SIZE.0 / units_per_em
 }
