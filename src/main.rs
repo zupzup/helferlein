@@ -130,7 +130,17 @@ fn main() -> Result<(), anyhow::Error> {
 fn handle_background_events(event: Event, sender: Sender<GuiEvent>, db: &db::DB) {
     match event {
         Event::OpenFile(file) => {
-            if let Err(e) = open::with(&file, "firefox") {
+            // read on each click, so a program changed in settings applies without restart
+            let program = config::load_config()
+                .ok()
+                .and_then(|c| c.file_open_command)
+                .map(|p| p.trim().to_owned())
+                .filter(|p| !p.is_empty());
+            let res = match program {
+                Some(program) => open::with(&file, program),
+                None => open::that(&file),
+            };
+            if let Err(e) = res {
                 error!("Could not open file {file}: {e}");
                 util::send_gui_event(
                     &sender,
