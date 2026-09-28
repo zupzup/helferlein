@@ -99,11 +99,10 @@ impl AutoSuggest {
             self.selected_index = None;
         }
 
-        if let Some(idx) = self.selected_index {
-            if idx >= data.len() {
+        if let Some(idx) = self.selected_index
+            && idx >= data.len() {
                 self.selected_index = None;
             }
-        }
 
         if let (Some(idx), true) = (
             self.selected_index,

@@ -122,8 +122,8 @@ pub(crate) fn render_to(
     let addr = &address.postal_address.trim().to_owned();
     let zip_city = &format!(
         "{} {}",
-        &address.zip.trim().to_owned(),
-        &address.city.trim().to_owned()
+        address.zip.trim().to_owned(),
+        address.city.trim().to_owned()
     );
     let country = &address.country.trim().to_owned();
     let vat = &address.vat.trim().to_owned();
@@ -168,8 +168,8 @@ pub(crate) fn render_from(
     let addr = &address.postal_address.trim().to_owned();
     let zip_city = &format!(
         "{} {}",
-        &address.zip.trim().to_owned(),
-        &address.city.trim().to_owned()
+        address.zip.trim().to_owned(),
+        address.city.trim().to_owned()
     );
     let country = &address.country.trim().to_owned();
 
@@ -764,9 +764,9 @@ pub(crate) fn render_footer(
     let name = &address.name.trim().to_owned();
     let addr = &format!(
         "{}, {} {}",
-        &address.postal_address.trim().to_owned(),
-        &address.zip.trim().to_owned(),
-        &address.city.trim().to_owned()
+        address.postal_address.trim().to_owned(),
+        address.zip.trim().to_owned(),
+        address.city.trim().to_owned()
     );
     layer.use_text(name, FONT_SIZE.0, LEFT, calc_top(top, from_top), font);
 

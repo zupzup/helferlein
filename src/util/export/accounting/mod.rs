@@ -469,7 +469,7 @@ fn render_row(
     col_line_x += DATE_WIDTH.0;
     render_col_line(Mm(LEFT.0 + col_line_x), top, layer);
     // COMPANY + NAME
-    let mut company_name_str: String = format!("{} - {}", &item.company.0, &item.name);
+    let mut company_name_str: String = format!("{} - {}", item.company.0, item.name);
     if company_name_str.chars().count() > COMPANY_NAME_CUTOFF_CHARS {
         company_name_str = company_name_str
             .chars()

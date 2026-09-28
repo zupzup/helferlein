@@ -346,9 +346,9 @@ pub(crate) fn build(
             dialog.open();
             state.accounting.export_state.open_file_dialog = Some(dialog);
         }
-        if let Some(dialog) = &mut state.accounting.export_state.open_file_dialog {
-            if dialog.show(ctx).selected() {
-                if let Some(file) = dialog.path() {
+        if let Some(dialog) = &mut state.accounting.export_state.open_file_dialog
+            && dialog.show(ctx).selected()
+                && let Some(file) = dialog.path() {
                     let path_buf;
                     match file.extension() {
                         None => {
@@ -365,15 +365,12 @@ pub(crate) fn build(
                     state.file_picker_startpoint = Some(path_buf.clone());
                     state.accounting.export_state.selected_path = Some(path_buf);
                 }
-            }
-        }
 
-        if let Some(ref path_buf) = state.accounting.export_state.selected_path {
-            if let Some(ref accounting_sheet) = state.accounting.selected_accounting_sheet {
+        if let Some(ref path_buf) = state.accounting.export_state.selected_path
+            && let Some(ref accounting_sheet) = state.accounting.selected_accounting_sheet {
                 create_pdf(path_buf, accounting_sheet, app_context);
                 state.accounting.export_state.selected_path = None;
             }
-        }
     });
 }
 

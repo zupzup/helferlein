@@ -68,8 +68,8 @@ fn main() -> Result<(), anyhow::Error> {
     std::thread::spawn(move || {
         let mut db: Option<DB> = None;
         while let Ok(event) = background_event_receiver.recv() {
-            if let Event::SetDB(ref data_folder) = event {
-                if db.is_none() {
+            if let Event::SetDB(ref data_folder) = event
+                && db.is_none() {
                     db = Some(DB::new(data_folder.as_path()));
                     if let Some(ref db) = db {
                         handle_background_events(
@@ -94,7 +94,6 @@ fn main() -> Result<(), anyhow::Error> {
                         );
                     }
                 }
-            }
             if let Some(ref db) = db {
                 handle_background_events(event, gui_event_sender_clone.clone(), db);
             }
@@ -163,7 +162,7 @@ fn handle_background_events(event: Event, sender: Sender<GuiEvent>, db: &db::DB)
                 Err(e) => {
                     error!(
                         "Could not create item with id {:?} and re-fetch items: {e}",
-                        &item.id
+                        item.id
                     );
                     util::send_gui_event(
                         &sender,
@@ -251,7 +250,7 @@ fn handle_background_events(event: Event, sender: Sender<GuiEvent>, db: &db::DB)
                 Err(e) => {
                     error!(
                         "Could not create invoice template with id {:?} and re-fetch items: {e}",
-                        &invoice.id
+                        invoice.id
                     );
                     util::send_gui_event(
                         &sender,
@@ -482,24 +481,21 @@ impl Helferlein {
 
                                             if let Some(dialog) =
                                                 &mut self.state.config_state.open_file_dialog
-                                            {
-                                                if dialog.show(ctx).selected() {
-                                                    if let Some(folder) = dialog.path() {
+                                                && dialog.show(ctx).selected()
+                                                    && let Some(folder) = dialog.path() {
                                                         self.state.file_picker_startpoint =
                                                             Some(folder.to_path_buf());
                                                         self.state.config_state.selected_folder =
                                                             Some(folder.to_path_buf());
                                                     }
-                                                }
-                                            }
                                         });
                                     });
                                 });
                                 strip.empty();
                                 strip.cell(|ui| {
                                     ui.vertical_centered(|ui| {
-                                        if ui.button(Messages::Done.msg()).clicked() {
-                                            if let Some(ref data_folder) =
+                                        if ui.button(Messages::Done.msg()).clicked()
+                                            && let Some(ref data_folder) =
                                                 self.state.config_state.selected_folder
                                             {
                                                 let cfg = Config {
@@ -521,7 +517,6 @@ impl Helferlein {
                                                     self.config = cfg;
                                                 }
                                             }
-                                        }
                                     });
                                 });
                                 strip.empty();
@@ -712,9 +707,9 @@ impl Helferlein {
             );
             ui.end_row();
 
-            if let Some(dialog) = &mut self.state.config_state.open_file_dialog {
-                if dialog.show(ui.ctx()).selected() {
-                    if let Some(folder) = dialog.path() {
+            if let Some(dialog) = &mut self.state.config_state.open_file_dialog
+                && dialog.show(ui.ctx()).selected()
+                    && let Some(folder) = dialog.path() {
                         self.state.config_state.selected_folder = Some(folder.to_path_buf());
                         self.state.config_state.change_data_folder_dialog = Some(Dialog::new(
                             Messages::ReallyChangeDataFolder.msg().to_string(),
@@ -722,15 +717,13 @@ impl Helferlein {
                             Messages::Cancel.msg(),
                         ));
                     }
-                }
-            }
 
             if let Some(ref dialog) = self.state.config_state.change_data_folder_dialog {
                 match dialog::render_dialog(ui.ctx(), dialog) {
                     DialogResponse::Ok => {
                         self.state.config_state.change_data_folder_dialog = None;
-                        if let Some(ref source) = self.config.data_folder {
-                            if let Some(ref target) = self.state.config_state.selected_folder {
+                        if let Some(ref source) = self.config.data_folder
+                            && let Some(ref target) = self.state.config_state.selected_folder {
                                 match util::files::move_folder_recursively(
                                     source.as_path(),
                                     target.as_path(),
@@ -766,7 +759,6 @@ impl Helferlein {
                                     }
                                 }
                             }
-                        }
                         self.state.config_state.selected_folder = None;
                     }
                     DialogResponse::Cancel => {

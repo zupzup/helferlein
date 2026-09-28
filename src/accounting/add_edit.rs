@@ -256,8 +256,8 @@ pub(super) fn build(
                     accounting_state.item.open_file_dialog = Some(dialog);
                 }
 
-                if let Some(dialog) = &mut accounting_state.item.open_file_dialog {
-                    if dialog.show(ctx).selected() {
+                if let Some(dialog) = &mut accounting_state.item.open_file_dialog
+                    && dialog.show(ctx).selected() {
                         if let Some(file) = dialog.path() {
                             state.file_picker_startpoint = Some(file.to_path_buf());
                             accounting_state.item.file = file.to_path_buf();
@@ -267,7 +267,6 @@ pub(super) fn build(
                             .validation
                             .clear_for_field(&Field::File);
                     }
-                }
             });
             render_field_warnings(&Field::File, accounting_state, ui);
             render_field_errors(&Field::File, accounting_state, ui);

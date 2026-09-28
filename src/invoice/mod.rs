@@ -724,8 +724,8 @@ pub(crate) fn build(ctx: &Context, state: &mut State, app_context: &AppContext, 
                         }
                     }
                     if let Some(dialog) = &mut state.invoice.export_state.open_file_dialog {
-                        if dialog.show(ctx).selected() {
-                            if let Some(file) = dialog.path() {
+                        if dialog.show(ctx).selected()
+                            && let Some(file) = dialog.path() {
                                 let path_buf;
                                 match file.extension() {
                                     None => {
@@ -742,7 +742,6 @@ pub(crate) fn build(ctx: &Context, state: &mut State, app_context: &AppContext, 
                                 state.file_picker_startpoint = Some(path_buf.clone());
                                 state.invoice.export_state.selected_path = Some(path_buf);
                             }
-                        }
                         if let Some(ref path_buf) = state.invoice.export_state.selected_path {
                             let invoice: Invoice = Invoice::from(&state.invoice);
                             export_pdf(path_buf, app_context, &invoice);

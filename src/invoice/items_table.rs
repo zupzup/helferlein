@@ -77,7 +77,7 @@ pub(super) fn build(state: &mut InvoiceState, ui: &mut Ui) {
                 row.col(|ui| {
                     ui.horizontal(|ui| {
                         if ui.button(Messages::Delete.msg()).clicked() {
-                            info!("delete clicked on {}", &item.id);
+                            info!("delete clicked on {}", item.id);
                             item_to_remove = Some(row_index);
                         }
                     });
